@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+	<name>nturt_radio_communicator</name>
+	<version>0.0.0</version>
+	<description>ROS2 package for sending sensor data from a sender to a reciever through radio communicator</description>
+	<maintainer email="chris920325@gmail.com">CHYang</maintainer>
+	<author email="kuojack0114@gmail.com">Chemmy-Jack</author>
+	<author email="chris920325@gmail.com">CHYang</author>
+	<license>TODO: License declaration</license>
+
+	<!-- general dependencies-->
+	<depend>can_msgs</depend>
+	<depend>geometry_msgs</depend>
+	<depend>nturt_can_config</depend>    
+	<depend>nturt_ros_interface</depend>
+	<depend>rclcpp</depend>
+	<depend>rclcpp_components</depend>
+	<depend>sensor_msgs</depend>
+
+	<!-- build dependencies -->
+	<buildtool_depend>ament_cmake</buildtool_depend>
+
+	<!-- execute dependencise -->
+    <exec_depend>ros2launch</exec_depend>
+
+	<!-- test dependencies -->
+	<test_depend>ament_lint_auto</test_depend>
+	<test_depend>ament_lint_common</test_depend>
+
+	<export>
+		<build_type>ament_cmake</build_type>
+	</export>
+</package>
