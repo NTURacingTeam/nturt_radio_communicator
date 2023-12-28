@@ -3,7 +3,7 @@
 <package format="3">
 	<name>nturt_radio_communicator</name>
 	<version>0.0.0</version>
-	<description>ROS2 package for sending sensor data from a sender to a reciever through radio communicator</description>
+	<description>ROS2 package for sending sensor data from a sender to a receiver through radio communicator</description>
 	<maintainer email="chris920325@gmail.com">CHYang</maintainer>
 	<author email="kuojack0114@gmail.com">Chemmy-Jack</author>
 	<author email="chris920325@gmail.com">CHYang</author>

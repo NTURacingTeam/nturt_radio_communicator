@@ -2,7 +2,7 @@
  * @file radio_communicator.hpp
  * @author Majorly by Jack b10502016@ntu.edu.tw, Minorly by Chris b10902069@ntu.edu.tw
  * @brief ROS2 package having two executable, one is a sender who gets data from CAN sensor and GPS sensor
- * then sends it to the reciever, the other is the reciever.
+ * then sends it to the receiver, the other is the receiver.
  */
 
 #ifndef NTURT_RADIO_COMMUNICATOR_HPP
@@ -41,9 +41,11 @@
 #define TERMINAL "/dev/ttyUSB0"
 #define BAUDRATE B115200
 
+int counter = 0;
+
 /**
  * @author Jack b10502016@ntu.edu.tw, modified by Chris b10902069@ntu.edu.tw
- * @brief Class for sending data to the reciever
+ * @brief Class for sending data to the receiver
  */
 class RadioSender : public rclcpp::Node {
     public:
@@ -119,8 +121,9 @@ class RadioSender : public rclcpp::Node {
         /// @brief Struct for storing battery data.
         BatteryData battery_data_;
 
-        /// @brief String stream for sending data to control tower.
-        std::stringstream ss_;
+        /// @brief protocol array sending data to control tower.
+        uint64_t *protocol_fast_data_;
+        uint64_t *protocol_slow_data_;
 
         /// @brief file descriptor for device file
         int fd;
@@ -139,5 +142,6 @@ class RadioSender : public rclcpp::Node {
 
 //     private:
 // }
+
 
 #endif // NTURT_RADIO_COMMUNICATOR_HPP

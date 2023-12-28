@@ -1,4 +1,4 @@
-#define TERMINAL    "/dev/ttyUSB1"
+#define TERMINAL    "/dev/ttyUSB0"
 
 #include <errno.h>
 #include <fcntl.h> 

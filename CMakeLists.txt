@@ -28,7 +28,7 @@ add_library(${PROJECT_NAME} SHARED
         src/radio_sender.cpp
 )
 # add_library(${PROJECT_NAME} SHARED
-#         src/radio_reciever_node.cpp
+#         src/radio_receiver_node.cpp
 # )
 ament_target_dependencies(${PROJECT_NAME}
         can_msgs
@@ -50,19 +50,19 @@ set(node_plugins "${node_plugins}RadioSender;$<TARGET_FILE:nturt_radio_communica
 add_executable(${PROJECT_NAME}_sender_node
         app/radio_sender_node.cpp
 )
-# add_executable(${PROJECT_NAME}_reciever_node
-# 	app/radio_reciever_node.cpp
+# add_executable(${PROJECT_NAME}_receiver_node
+# 	app/radio_receiver_node.cpp
 # )
 target_link_libraries(${PROJECT_NAME}_sender_node
         ${PROJECT_NAME}
 )
-# target_link_libraries(${PROJECT_NAME}_reciever_node
+# target_link_libraries(${PROJECT_NAME}_receiver_node
 #         ${PROJECT_NAME}
 # )
 ament_target_dependencies(${PROJECT_NAME}_sender_node
         rclcpp
 )
-# ament_target_dependencies(${PROJECT_NAME}_reciever_node
+# ament_target_dependencies(${PROJECT_NAME}_receiver_node
 #         rclcpp
 # )
 
@@ -82,8 +82,8 @@ install(TARGETS ${PROJECT_NAME}
 install(TARGETS ${PROJECT_NAME}_sender_node
         DESTINATION lib/${PROJECT_NAME}
 )
-# install(TARGETS ${PROJECT_NAME}_reciever_node
-# 	DESTINATION lib/${PROJECT_NAME}_reciever
+# install(TARGETS ${PROJECT_NAME}_receiver_node
+# 	DESTINATION lib/${PROJECT_NAME}_receiver
 # )
 
 # install launch scripts

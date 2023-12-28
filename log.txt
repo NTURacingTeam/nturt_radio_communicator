@@ -1,0 +1,105 @@
+batch:
+	can_rx_error_node
+	
+	vcu_status
+	vcu_error_code
+	
+	brake
+	accelerator_1
+	accelerator_2
+	steer_angle
+	brake_micro
+	accelerator_micro
+	
+	front_left_wheel_speed
+	front_right_wheel_speed
+	front_brake_pressure
+	rear_brake_pressure
+	front_left_suspension
+	front_right_suspension
+	
+	front_left_tire_temp1
+	front_left_tire_temp2
+	front_left_tire_temp3
+	front_left_tire_temp4
+	front_right_tire_temp1
+	front_right_tire_temp2
+	front_right_tire_temp3
+	front_right_tire_temp4
+	
+	rear_left_wheel_speed
+	rear_right_wheel_speed
+	rear_left_suspension
+	rear_right_suspension
+	
+	rear_left_tire_temp1
+	rear_left_tire_temp2
+	rear_left_tire_temp3
+	rear_left_tire_temp4
+	rear_right_tire_temp1
+	rear_right_tire_temp2
+	rear_right_tire_temp3
+	rear_right_tire_temp4
+	
+	rear_sensor_status
+	rear_sensor_error_code
+	
+	bms_error_code
+	
+	state_of_charge
+	
+	inverter_control_board_temperature
+	inverter_hot_spot_temperature
+	motor_temperature
+	
+	inverter_post_fault_lo
+	inverter_post_fault_hi
+	inverter_run_fault_lo
+	inverter_run_fault_hi
+	
+	torque_command
+	torque_feedback
+	motor_speed
+	inverter_dc_bus_voltage
+	
+	inverter_vsm_state
+	inverter_state
+	inverter_dc_bus_current
+	
+	imu_acceleration_x
+	imu_acceleration_y
+	imu_acceleration_z
+	
+	imu_angular_velocity_x
+	imu_angular_velocity_y
+	imu_angular_velocity_z
+	
+	imu_quaternion_w
+	imu_quaternion_x
+	imu_quaternion_y
+	imu_quaternion_z
+	
+	gps_fix_longitude
+	gps_fix_latitude
+	gps_fix_altitude
+	
+	gps_vel_linear_x
+	gps_vel_linear_y
+	
+	cpu_usage
+	memory_usage
+	swap_usage
+	disk_usage
+	cpu_temperature
+	
+timestamp: std::fixed << get_clock()->now().seconds() << std::defaultfloat
+
+
+accumulator:
+	voltage: NUM_BATTERY_SEGMENT x NUM_BATTERY_CELL_PER_SEGMENT array
+	accumulator_temperature: NUM_BATTERY_SEGMENT x NUM_BATTERY_CELL_PER_SEGMENT array
+	
+timestamp: std::fixed << get_clock()->now().seconds() << std::defaultfloat
+	
+	
+	
