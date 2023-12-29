@@ -37,6 +37,8 @@
 // for s, ms literal operator
 using namespace std::chrono_literals;
 
+int counter = 0;
+
 RadioSender::RadioSender(rclcpp::NodeOptions options)
     : Node("nturt_radio_sender_node", options),
         can_sub_(this->create_subscription<can_msgs::msg::Frame>(
@@ -74,25 +76,25 @@ RadioSender::RadioSender(rclcpp::NodeOptions options)
     
     // allocate protocol data array memory
     protocol_fast_data_ = (uint64_t*)malloc(FAST_DATA_FORMAT_PROTOCOL_LEN*sizeof(uint64_t));
-    protocol_slow_data_ = (uint64_t*)malloc((NUM_BATTERY_SEGMENT*NUM_BATTERY_CELL_PER_SEGMENT*2+2)*sizeof(uint64_t));
+    protocol_slow_data_ = (uint64_t*)malloc(SLOW_DATA_FORMAT_PROTOCOL_LEN*sizeof(uint64_t));
 
     // init can_rx_
     memset(&can_rx_, 0, sizeof(can_rx_));
     nturt_can_config_logger_Check_Receive_Timeout_Init(&can_rx_);
 
     // set file descriptor for tty device
-    strcpy(portname, TERMINAL);
-    if((fd = open(portname, O_RDWR | O_NOCTTY | O_SYNC)) < 0) {
+    strcpy(portname_, TERMINAL);
+    if((fd_ = open(portname_, O_RDWR | O_NOCTTY | O_SYNC)) < 0) {
         RCLCPP_ERROR(get_logger(), 
-        "Error opening %s: %s\n", portname, strerror(errno));
+        "Error opening %s: %s\n", portname_, strerror(errno));
     } else {
-        RCLCPP_INFO(get_logger(), "Successfully opened the tty device %s at file descriptor %d\n", portname, fd);
+        RCLCPP_INFO(get_logger(), "Successfully opened the tty device %s at file descriptor %d\n", portname_, fd_);
     }
 
     // setup the tty device with correct setting
     struct termios tty;
 
-    if (tcgetattr(fd, &tty) < 0) {
+    if (tcgetattr(fd_, &tty) < 0) {
         RCLCPP_ERROR(get_logger(), "Error from tcgetattr: %s\n", strerror(errno));
     }
 
@@ -115,10 +117,10 @@ RadioSender::RadioSender(rclcpp::NodeOptions options)
     tty.c_cc[VMIN] = 1;
     tty.c_cc[VTIME] = 1;
 
-    if (tcsetattr(fd, TCSANOW, &tty) != 0) {
+    if (tcsetattr(fd_, TCSANOW, &tty) != 0) {
         RCLCPP_ERROR(get_logger(), "Error from tcsetattr: %s\n", strerror(errno));
     }
-};
+}
 
 void RadioSender::register_can_callback() {
     CanCallbackRegieter::register_callback(
@@ -320,14 +322,14 @@ void RadioSender::send_fast_data_timer_callback() {
     // sender send to receiver
     int fast_data_format_len = FAST_DATA_FORMAT_PROTOCOL_LEN * sizeof(uint64_t);
     int written_len;
-    if((written_len = write(fd, protocol_fast_data_, fast_data_format_len)) != fast_data_format_len) {
+    if((written_len = write(fd_, protocol_fast_data_, fast_data_format_len)) != fast_data_format_len) {
         RCLCPP_ERROR(get_logger(), 
             "Error from write: expected written len:%d, written len:%d\n", 
             fast_data_format_len,
             written_len
         );
     }
-    tcdrain(fd); /*delay for output*/
+    tcdrain(fd_); /*delay for output*/
 };
 
 void RadioSender::send_slow_data_timer_callback() {
@@ -356,14 +358,14 @@ void RadioSender::send_slow_data_timer_callback() {
     // sender send to receiver
     int slow_data_format_len = slow_data_acc_len * sizeof(uint64_t);
     int written_len;
-    if((written_len = write(fd, protocol_slow_data_, slow_data_format_len)) != slow_data_format_len) {
+    if((written_len = write(fd_, protocol_slow_data_, slow_data_format_len)) != slow_data_format_len) {
         RCLCPP_ERROR(get_logger(), 
             "Error from write: expected written len:%d, written len:%d\n", 
             slow_data_format_len,
             written_len
         );
     }
-    tcdrain(fd); /*delay for output*/
+    tcdrain(fd_); /*delay for output*/
 }
 
 uint32_t RadioSender::get_tick() {

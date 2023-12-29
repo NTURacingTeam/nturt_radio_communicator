@@ -9,9 +9,9 @@ def generate_launch_description():
         executable="nturt_radio_communication_sender_node",
         output="both"
     )
-    # radio_reciever_node = Node(
+    # radio_receiver_node = Node(
     #     package="nturt_radio_communication",
-    #     executable="nturt_radio_communication_reciever_node",
+    #     executable="nturt_radio_communication_receiver_node",
     #     output="both"
     # )
     return LaunchDescription([radio_sender_node])

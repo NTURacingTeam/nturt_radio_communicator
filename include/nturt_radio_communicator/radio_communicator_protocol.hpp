@@ -6,6 +6,7 @@
 
 // define the data format
 #define FAST_DATA_FORMAT_PROTOCOL_LEN 75
+#define SLOW_DATA_FORMAT_PROTOCOL_LEN (NUM_BATTERY_SEGMENT*NUM_BATTERY_CELL_PER_SEGMENT*2+2)
 #define FAST_DATA_IDENTIFIER 0
 #define SLOW_DATA_IDENTIFIER 1
 
@@ -128,3 +129,6 @@ enum fast_data_format_protocol{
     // time stamp
     PTIME_STAMP,
 }; 
+
+// define the receive data buffer size
+#define RECEIVE_DATA_BUFFER_SIZE 2048

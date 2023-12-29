@@ -41,8 +41,6 @@
 #define TERMINAL "/dev/ttyUSB0"
 #define BAUDRATE B115200
 
-int counter = 0;
-
 /**
  * @author Jack b10502016@ntu.edu.tw, modified by Chris b10902069@ntu.edu.tw
  * @brief Class for sending data to the receiver
@@ -126,10 +124,10 @@ class RadioSender : public rclcpp::Node {
         uint64_t *protocol_slow_data_;
 
         /// @brief file descriptor for device file
-        int fd;
+        int fd_;
 
         /// @brief port name
-        char portname[30];
+        char portname_[30];
 };
 
 
@@ -137,11 +135,43 @@ class RadioSender : public rclcpp::Node {
  * @author Chris b10902069@ntu.edu.tw
  * @brief Class for recieving data from sender
 */
-// class RadioReciever : public rclcpp::Node {
-//     public:
+class RadioReceiver : public rclcpp::Node {
+    public:
+        /// @brief Constructor for RadioReceiver
+        RadioReceiver(rclcpp::NodeOptions options);
+    private:
+        /// @brief Callback function when receiving data from radio usb device
+        void receive_data_timer_callback();        
 
-//     private:
-// }
+        /// @brief ROS2 timer for periodically checking radio receive timeout
+        rclcpp::TimerBase::SharedPtr receive_data_timer_;
 
+        /// @brief Struct for storing can frame data.
+        nturt_can_config_logger_rx_t can_rx_;
+
+        /// @brief Struct for storing "/fix" message data.
+        sensor_msgs::msg::NavSatFix gps_fix_;
+
+        /// @brief Struct for storing "/vel" message data.
+        geometry_msgs::msg::TwistStamped gps_vel_;
+
+        /// @brief Struct for storing "/system_stats" message data.
+        nturt_ros_interface::msg::SystemStats system_stats_;
+
+        /// @brief Struct for storing battery data.
+        BatteryData battery_data_;
+
+        /// @brief protocol buffer array receiving data
+        uint64_t *protocol_receive_data_;
+
+        /// @brief protocol buffer array pointer, specifying the head
+        int protocol_receive_data_head_;
+
+        /// @brief file descriptor for device file
+        int fd_;
+
+        /// @brief port name
+        char portname_[30];
+};
 
 #endif // NTURT_RADIO_COMMUNICATOR_HPP
