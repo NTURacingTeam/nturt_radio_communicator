@@ -120,14 +120,17 @@ class RadioSender : public rclcpp::Node {
         BatteryData battery_data_;
 
         /// @brief protocol array sending data to control tower.
-        uint64_t *protocol_fast_data_;
-        uint64_t *protocol_slow_data_;
+        uint32_t *protocol_fast_data_;
+        uint32_t *protocol_slow_data_;
 
         /// @brief file descriptor for device file
         int fd_;
 
         /// @brief port name
         char portname_[30];
+
+        /// @brief  slow data function counter
+        int slow_data_function_counter;
 };
 
 
@@ -162,7 +165,7 @@ class RadioReceiver : public rclcpp::Node {
         BatteryData battery_data_;
 
         /// @brief protocol buffer array receiving data
-        uint64_t *protocol_receive_data_;
+        uint32_t *protocol_receive_data_;
 
         /// @brief protocol buffer array pointer, specifying the head
         int protocol_receive_data_head_;

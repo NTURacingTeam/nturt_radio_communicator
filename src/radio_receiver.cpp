@@ -40,22 +40,22 @@ using namespace std::chrono_literals;
 RadioReceiver::RadioReceiver(rclcpp::NodeOptions options)
     : Node("nturt_radio_receiver_node", options),
         receive_data_timer_(this->create_wall_timer(
-            200ms,
+            100ms,
             std::bind(&RadioReceiver::receive_data_timer_callback, this))
         ) {
     // initialize the buffer head to 0
     protocol_receive_data_head_ = 0;
 
     // NUM_BATTERY_SEGMENT*NUM_BATTERY_CELL_PER_SEGMENT*2+2 > FAST_DATA_FORMAT_PROTOCOL_LEN
-    protocol_receive_data_ = (uint64_t*)malloc(RECEIVE_DATA_BUFFER_SIZE*sizeof(uint64_t));
-    protocol_receive_data_[PFAST_DATA_IDENTIFIER] = ~0UL;
+    protocol_receive_data_ = (uint32_t*)malloc(RECEIVE_DATA_BUFFER_SIZE*sizeof(uint32_t));
+    protocol_receive_data_[PFAST_DATA_IDENTIFIER] = 0U;
 
     // init can_rx_
     memset(&can_rx_, 0, sizeof(can_rx_));
     nturt_can_config_logger_Check_Receive_Timeout_Init(&can_rx_);
 
     // set file descriptor for tty device
-    strcpy(portname_, TERMINAL);
+    strcpy(portname_, "/dev/ttyUSB1");
     if((fd_ = open(portname_, O_RDWR | O_NOCTTY | O_SYNC)) < 0) {
         RCLCPP_ERROR(get_logger(), 
         "Error opening %s: %s\n", portname_, strerror(errno));
@@ -92,6 +92,9 @@ RadioReceiver::RadioReceiver(rclcpp::NodeOptions options)
     if (tcsetattr(fd_, TCSANOW, &tty) != 0) {
         RCLCPP_ERROR(get_logger(), "Error from tcsetattr: %s\n", strerror(errno));
     }
+
+    // clear the buffer
+    read(fd_, NULL, RECEIVE_DATA_BUFFER_SIZE * sizeof(uint32_t));
 }
 
 void RadioReceiver::receive_data_timer_callback() {
@@ -99,9 +102,17 @@ void RadioReceiver::receive_data_timer_callback() {
     // read a full packet of fast data or slow data
     do{
         // read the data from fd_ to buffer
-        rdlen = read(fd_, protocol_receive_data_ + protocol_receive_data_head_, 
-                     (RECEIVE_DATA_BUFFER_SIZE - protocol_receive_data_head_)*sizeof(uint64_t));
-        protocol_receive_data_head_ += rdlen;
+        if(protocol_receive_data_[PFAST_DATA_IDENTIFIER] == FAST_DATA_IDENTIFIER){
+            rdlen = read(fd_, protocol_receive_data_ + protocol_receive_data_head_,
+                            (FAST_DATA_FORMAT_PROTOCOL_LEN-protocol_receive_data_head_)*sizeof(uint32_t));
+        }else if(protocol_receive_data_[PFAST_DATA_IDENTIFIER] == SLOW_DATA_IDENTIFIER){
+            rdlen = read(fd_, protocol_receive_data_ + protocol_receive_data_head_,
+                            (SLOW_DATA_FORMAT_PROTOCOL_LEN-protocol_receive_data_head_)*sizeof(uint32_t));
+        }
+        if(rdlen % 4 != 0){
+            std::cout << rdlen << '\n';
+        }
+        protocol_receive_data_head_ += rdlen / 4;
 
     }while(!((protocol_receive_data_[PFAST_DATA_IDENTIFIER] == FAST_DATA_IDENTIFIER 
             && protocol_receive_data_head_ >= FAST_DATA_FORMAT_PROTOCOL_LEN) 
@@ -112,14 +123,20 @@ void RadioReceiver::receive_data_timer_callback() {
     if(protocol_receive_data_[PFAST_DATA_IDENTIFIER] == FAST_DATA_IDENTIFIER){
         std::cout << "=======================================\n";
         for(int i=0; i<FAST_DATA_FORMAT_PROTOCOL_LEN; i++)
-            std::cout << protocol_receive_data_[i];
+            std::cout << protocol_receive_data_[i] << ' ';
         std::cout << "\n";
+
         protocol_receive_data_head_ -= FAST_DATA_FORMAT_PROTOCOL_LEN;
     }else if(protocol_receive_data_[PFAST_DATA_IDENTIFIER] == SLOW_DATA_IDENTIFIER){
         std::cout << "=======================================\n";
         for(int i=0; i<SLOW_DATA_FORMAT_PROTOCOL_LEN; i++)
-            std::cout << protocol_receive_data_[i];
+            std::cout << protocol_receive_data_[i] << ' ';
         std::cout << "\n";
+        
         protocol_receive_data_head_ -= SLOW_DATA_FORMAT_PROTOCOL_LEN;
     }
+    std::cout << protocol_receive_data_head_ << '\n';
 }
+
+#include "rclcpp_components/register_node_macro.hpp"
+RCLCPP_COMPONENTS_REGISTER_NODE(RadioReceiver)
